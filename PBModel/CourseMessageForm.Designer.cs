@@ -111,6 +111,7 @@
 			// 
 			// courseMessage
 			// 
+			this.courseMessage.AllowUserToAddRows = false;
 			this.courseMessage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.courseMessage.Location = new System.Drawing.Point(6, 15);
 			this.courseMessage.Name = "courseMessage";
