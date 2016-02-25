@@ -29,12 +29,14 @@ namespace PBModel
 			conn.Open();
 			SqlDataAdapter dtp = new SqlDataAdapter("select * from S", conn);
 			DataSet ds = new DataSet();
-			dtp.Fill(ds);
-			number.Text = ds.Tables["s"].Rows.Count.ToString();//某一表中数据的行数
+			dtp.Fill(ds,"s");
+			studentMessage.DataSource = ds.Tables["s"];
+			number.Text = ds.Tables["s"].Rows.Count.ToString();
+			
 			
 			conn.Close(); 
 		}
-		//保存
+		//保存,这里需要更新数据库
 		private void save_Click(object sender, EventArgs e)
 		{
 			conn.Open();
@@ -51,6 +53,11 @@ namespace PBModel
 		private void exist_Click(object sender, EventArgs e)
 		{
 			this.Close();
+		}
+
+		private void delete_Click(object sender, EventArgs e)
+		{
+			//手动删除之后，更新数据库
 		}
 	}
 }

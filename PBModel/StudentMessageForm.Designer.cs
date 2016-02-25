@@ -70,6 +70,7 @@
 			this.delete.TabIndex = 2;
 			this.delete.Text = "删除";
 			this.delete.UseVisualStyleBackColor = true;
+			this.delete.Click += new System.EventHandler(this.delete_Click);
 			// 
 			// exist
 			// 

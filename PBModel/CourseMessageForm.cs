@@ -38,7 +38,7 @@ namespace PBModel
 
 		private void delete_Click(object sender, EventArgs e)
 		{
-			//待定
+			//待定，手动删除之后需要更新数据库
 		}
 
 		private void exist_Click(object sender, EventArgs e)
@@ -52,7 +52,8 @@ namespace PBModel
 			conn.Open();
 			SqlDataAdapter dtp = new SqlDataAdapter("select * from c", conn);
 			DataSet ds = new DataSet();
-			dtp.Fill(ds);
+			dtp.Fill(ds, "c");
+			courseMessage.DataSource = ds.Tables["c"];
 			number.Text = ds.Tables["c"].Rows.Count.ToString();//某一表中数据的行数
 
 			conn.Close(); 

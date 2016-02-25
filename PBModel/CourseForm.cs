@@ -55,10 +55,16 @@ namespace PBModel
 				dtp.Fill(ds,"save");
 				showStudent.DataSource = ds.Tables["save"];
 				SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
+				//dtp.UpdateCommand = builder.GetUpdateCommand();
+				DataTable dt = ds.Tables["save"];
+				dt.PrimaryKey = new DataColumn[] { dt.Columns["sno"], dt.Columns["cno"] };
+
+				dtp.Update(dt);
+				ds.Tables["save"].AcceptChanges();
 				//dtp.Update(ds.Tables["save"]);
 				//ds.Tables["save"].AcceptChanges();
-				dtp.Update(ds.Tables["save"]);
-				showStudent.Update();
+				//dtp.Update(ds.Tables["save"]);
+				//showStudent.Update();
 
 				//更新之后再次查询
 				SqlDataAdapter dtpSelect = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='" + courseChoose.Text.Trim() + "')", conn);
@@ -88,7 +94,7 @@ namespace PBModel
 		private void maintain_Click(object sender, EventArgs e)
 		{
 			String strMessage = maintainBox.SelectedItem.ToString();
-			if (strMessage.Equals("课程表"))
+			if (strMessage.Equals("课程信息"))
 			{
 				CourseMessageForm course = new CourseMessageForm();
 				course.Show();
