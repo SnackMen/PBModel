@@ -80,6 +80,7 @@
 			this.close.TabIndex = 2;
 			this.close.Text = "关闭";
 			this.close.UseVisualStyleBackColor = true;
+			this.close.Click += new System.EventHandler(this.close_Click);
 			// 
 			// courseNumber
 			// 
@@ -190,7 +191,6 @@
 			this.Controls.Add(this.groupBox1);
 			this.Name = "MainForm";
 			this.Text = "学生选课";
-			
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.groupBox1.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.studentMessage)).EndInit();

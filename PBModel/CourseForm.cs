@@ -23,10 +23,10 @@ namespace PBModel
 		private void select_Click(object sender, EventArgs e)
 		{
 			conn.Open();
-			SqlDataAdapter dtp = new SqlDataAdapter("select sno,grade from S where cno='(select cno from c where cname='"+courseChoose.Text+"'", conn);
+			SqlDataAdapter dtp = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='"+courseChoose.Text.Trim()+"')", conn);
 			DataSet ds = new DataSet();
-			dtp.Fill(ds);
-			showStudent.DataSource = ds.Tables[0];
+			dtp.Fill(ds,"select");
+			showStudent.DataSource = ds.Tables["select"];
 			conn.Close();
 		}
 
@@ -50,15 +50,23 @@ namespace PBModel
 				select.Enabled = true;
 				grade.Enabled = true;
 				exist.Enabled = true;
-				SqlDataAdapter dtp = new SqlDataAdapter("select sno,grade from S where cno='(select cno from c where cname='" + courseChoose.Text + "'", conn);
+				SqlDataAdapter dtp = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='" + courseChoose.Text.Trim() + "')", conn);
 				DataSet ds = new DataSet();
-				dtp.Fill(ds);
-				showStudent.DataSource = ds.Tables[0];
+				dtp.Fill(ds,"save");
+				showStudent.DataSource = ds.Tables["save"];
 				SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
-				dtp.Update(ds.Tables[0]);
-				ds.Tables[0].AcceptChanges();
-				conn.Close();
+				//dtp.Update(ds.Tables["save"]);
+				//ds.Tables["save"].AcceptChanges();
+				dtp.Update(ds.Tables["save"]);
+				showStudent.Update();
+
+				//更新之后再次查询
+				SqlDataAdapter dtpSelect = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='" + courseChoose.Text.Trim() + "')", conn);
+				DataSet dsSelect = new DataSet();
+				dtp.Fill(ds, "select1");
+				showStudent.DataSource = ds.Tables["select1"];
 				showStudent.ReadOnly = true;
+				conn.Close();
 			}
 			
 		}
@@ -68,7 +76,7 @@ namespace PBModel
 		{
 			GradeDistribute ds = new GradeDistribute();
 			ds.Show();
-			this.Hide();
+			//this.Hide();
 		}
 
 		private void exist_Click(object sender, EventArgs e)
@@ -100,13 +108,18 @@ namespace PBModel
 			maintainBox.Items.Add("学生信息");
 			maintainBox.Items.Add("课程信息");
 			maintainBox.SelectedIndex = 0;
-
+			//courseChoose显示课程名
 			SqlDataAdapter dtp = new SqlDataAdapter("select cname from c", conn);
 			DataSet ds = new DataSet();
 			dtp.Fill(ds,"c");
 			courseChoose.DataSource = ds.Tables["c"];
 			courseChoose.DisplayMember = "cname";
 
+			courseName.Text = courseChoose.Text;
+			SqlDataAdapter selectMessage = new SqlDataAdapter("select tname from c where cname='" + courseChoose.Text + "'", conn);
+			selectMessage.Fill(ds, "message");
+			DataRow dr = ds.Tables["message"].Rows[0];
+			teacherName.Text = dr["tname"].ToString();
 			conn.Close();
 		}
 		//鼠标单击combobox里面内容
@@ -123,5 +136,7 @@ namespace PBModel
 
 			conn.Close();
 		}
+
+		
 	}
 }

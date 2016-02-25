@@ -57,7 +57,7 @@
 			// name
 			// 
 			this.name.AutoSize = true;
-			this.name.Location = new System.Drawing.Point(196, 18);
+			this.name.Location = new System.Drawing.Point(175, 18);
 			this.name.Name = "name";
 			this.name.Size = new System.Drawing.Size(29, 12);
 			this.name.TabIndex = 2;

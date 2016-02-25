@@ -35,11 +35,18 @@ namespace PBModel
 		{
 			conn.Open();
 			number.Text = text;
+			DataSet ds = new DataSet();
 			SqlCommand cmd = new SqlCommand("select sname from s where sno='"+text+"'", conn);
 			SqlDataReader sqlr = cmd.ExecuteReader();
-			name.Text = sqlr.GetString(1);//第二列
+			if (sqlr.Read())
+			{
+				name.Text = sqlr["sname"].ToString();
+			}
+			sqlr.Close();
+			SqlDataAdapter insertHasselect2 = new SqlDataAdapter("select c.cno,cname,grade,credit,tname from C,sc where C.cno=sc.CNO and sc.SNO='" + text + "'", conn);//查询已经选的课程
+			insertHasselect2.Fill(ds, "6");
+			studentGrade.DataSource = ds.Tables["6"];
 			conn.Close();
-
 		}
 	}
 }

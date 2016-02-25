@@ -14,11 +14,13 @@ namespace PBModel
 	{
 		public LoginForm()
 		{
+			
 			InitializeComponent();
 		}
 
 		private void login_Click(object sender, EventArgs e)
 		{
+			
 			//要求输入学生学号和密码之后进入数据库查询，将查询结果保存一并进入下一个窗口
 			//以下为虚构
 			SqlConnection conn = new SqlConnection("server=.;integrated security=true;database=student");
