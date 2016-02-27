@@ -14,6 +14,8 @@ namespace PBModel
 	public partial class CourseForm : Form
 	{
 		SqlConnection conn = new SqlConnection("server=.;integrated security=true;database=student");
+		DataSet ds = new DataSet();
+		SqlDataAdapter dtp;
 		public CourseForm()
 		{
 			InitializeComponent();
@@ -22,11 +24,12 @@ namespace PBModel
 		//点击查询后在选修此课程中显示学号和成绩（成绩如果没有显示为空）
 		private void select_Click(object sender, EventArgs e)
 		{
-			conn.Open();
-			SqlDataAdapter dtp = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='"+courseChoose.Text.Trim()+"')", conn);
-			DataSet ds = new DataSet();
+			
+			dtp = new SqlDataAdapter("select sno,cno,grade from SC where cno=(select cno from c where cname='"+courseChoose.Text.Trim()+"')", conn);
+			ds.Reset();
 			dtp.Fill(ds,"select");
 			showStudent.DataSource = ds.Tables["select"];
+			
 			conn.Close();
 		}
 
@@ -41,6 +44,8 @@ namespace PBModel
 				select.Enabled = false;
 				grade.Enabled = false;
 				exist.Enabled = false;
+				showStudent.AllowUserToAddRows = true;
+				showStudent.ReadOnly = false;
 			}
 			else
 			{
@@ -50,29 +55,17 @@ namespace PBModel
 				select.Enabled = true;
 				grade.Enabled = true;
 				exist.Enabled = true;
-				SqlDataAdapter dtp = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='" + courseChoose.Text.Trim() + "')", conn);
-				DataSet ds = new DataSet();
-				dtp.Fill(ds,"save");
-				showStudent.DataSource = ds.Tables["save"];
-				SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
-				//dtp.UpdateCommand = builder.GetUpdateCommand();
-				DataTable dt = ds.Tables["save"];
-				dt.PrimaryKey = new DataColumn[] { dt.Columns["sno"], dt.Columns["cno"] };
-
-				dtp.Update(dt);
-				ds.Tables["save"].AcceptChanges();
-				//dtp.Update(ds.Tables["save"]);
-				//ds.Tables["save"].AcceptChanges();
-				//dtp.Update(ds.Tables["save"]);
-				//showStudent.Update();
-
-				//更新之后再次查询
-				SqlDataAdapter dtpSelect = new SqlDataAdapter("select sno,grade from SC where cno=(select cno from c where cname='" + courseChoose.Text.Trim() + "')", conn);
-				DataSet dsSelect = new DataSet();
-				dtp.Fill(ds, "select1");
-				showStudent.DataSource = ds.Tables["select1"];
+				if (ds.HasChanges())
+				{
+					SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
+					dtp.Update(ds, "select");
+					showStudent.Update();
+				}
+				dtp = new SqlDataAdapter("select sno,cno,grade from SC where cno=(select cno from c where cname='" + courseChoose.Text.Trim() + "')", conn);
+				dtp.Fill(ds, "selected");
+				showStudent.DataSource = ds.Tables["selected"];
+				showStudent.AllowUserToAddRows = false; ;
 				showStudent.ReadOnly = true;
-				conn.Close();
 			}
 			
 		}
@@ -80,7 +73,7 @@ namespace PBModel
 		//点击成绩分布按钮，进入到成绩分布主窗口
 		private void grade_Click(object sender, EventArgs e)
 		{
-			GradeDistribute ds = new GradeDistribute();
+			GradeDistribute ds = new GradeDistribute(courseChoose.Text);
 			ds.Show();
 			//this.Hide();
 		}
@@ -109,13 +102,14 @@ namespace PBModel
 		private void CourseForm_Load(object sender, EventArgs e)
 		{
 			showStudent.ReadOnly = true;
+			showStudent.AllowUserToAddRows = false;
 			conn.Open();
 
 			maintainBox.Items.Add("学生信息");
 			maintainBox.Items.Add("课程信息");
 			maintainBox.SelectedIndex = 0;
 			//courseChoose显示课程名
-			SqlDataAdapter dtp = new SqlDataAdapter("select cname from c", conn);
+			dtp = new SqlDataAdapter("select cname from c", conn);
 			DataSet ds = new DataSet();
 			dtp.Fill(ds,"c");
 			courseChoose.DataSource = ds.Tables["c"];
@@ -132,7 +126,7 @@ namespace PBModel
 		private void courseChoose_MouseClick(object sender, MouseEventArgs e)
 		{
 			courseName.Text = courseChoose.Text;
-			conn.Open();
+			//conn.Open();
 
 			SqlDataAdapter dtp = new SqlDataAdapter("select tname from c where cname='"+courseChoose.Text+"'", conn);
 			DataSet ds = new DataSet();

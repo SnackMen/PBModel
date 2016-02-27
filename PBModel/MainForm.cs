@@ -11,12 +11,8 @@ using System.Data.SqlClient;
 
 namespace PBModel
 {
-
-	
 	public partial class MainForm : Form
 	{
-		
-
 		SqlConnection conn = new SqlConnection("server=.;integrated security=true;database=student");
 		String text;
 		public MainForm(String userName)
@@ -24,7 +20,6 @@ namespace PBModel
 			text = userName;
 			InitializeComponent();
 		}
-		
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			conn.Open();
@@ -34,26 +29,32 @@ namespace PBModel
 			dtp.Fill(ds);//放到第一个表里面储存
 			studentMessage.DataSource = ds.Tables[0];
 			//conn.Close();
+			studentMessage.AllowUserToAddRows = false;
+			studentMessage.ReadOnly = true;
 
 			//已选修课程
 			//conn.Open();
 			SqlDataAdapter chooseDtp = new SqlDataAdapter("select c.cno,cname,grade from c,sc where sno='"+text+"'"+" and c.cno= sc.cno", conn);//查找已经选修的课程
 			chooseDtp.Fill(ds,"1");//放到表名为"1"的表中储存，虚拟表，自己随便起名字
 			choosedCourse.DataSource = ds.Tables["1"];
+			choosedCourse.ReadOnly = true;
+			choosedCourse.AllowUserToAddRows = false;
 
 
 			//可选课程
 			SqlDataAdapter canChooseDtp = new SqlDataAdapter("select cno,cname from c where cno not in(select cno from selecteds where sno='"+text+"') and c.cno not in (select cno from hasselect )", conn);//查找可选课程
 			canChooseDtp.Fill(ds,"2");
 			canChooseCourse.DataSource = ds.Tables["2"];
+			canChooseCourse.AllowUserToAddRows = false;
+			canChooseCourse.ReadOnly = true;
 
 			//查询已选课程
 			SqlDataAdapter selectedDtp = new SqlDataAdapter("select cno,cname,credit,cdept,tname from hasselect where sno='"+text+"'", conn);//查询已经选的课程
 			selectedDtp.Fill(ds,"3");
 			selectedCourse.DataSource = ds.Tables["3"];
-
+			selectedCourse.AllowUserToAddRows = false;
+			selectedCourse.ReadOnly = true;
 			conn.Close();
-
 		}
 
 		//点击选课按钮之后重新更新已经选的课程

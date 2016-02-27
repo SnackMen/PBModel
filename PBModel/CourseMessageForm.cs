@@ -13,49 +13,53 @@ namespace PBModel
 	public partial class CourseMessageForm : Form
 	{
 		SqlConnection conn = new SqlConnection("server=.;integrated security=true;database=student");
+		SqlDataAdapter dtp;
+		DataSet ds = new DataSet();
 		public CourseMessageForm()
 		{
-			InitializeComponent();
+			InitializeComponent();	
 		}
 
 		private void add_Click(object sender, EventArgs e)
 		{
 			courseMessage.ReadOnly = false;
+			courseMessage.AllowUserToAddRows = true;
 		}
 
 		private void save_Click(object sender, EventArgs e)
 		{
-			SqlDataAdapter dtp = new SqlDataAdapter();
-			dtp.SelectCommand = new SqlCommand("select * from C", conn);
-			SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
-			conn.Open();
-			DataSet ds = new DataSet();
-			dtp.Fill(ds,"course");
-			//courseMessage.DataSource = ds.Tables["course"];
-			dtp.InsertCommand = builder.GetInsertCommand();
-			dtp.Update(ds,"course");
-			//ds.Tables[0].AcceptChanges();
-
-			
-			//SqlDataAdapter dtpCourse = new SqlDataAdapter("select * from c", conn);
-			////DataSet ds = new DataSet();
-			//dtp.Fill(ds, "c");
-			//courseMessage.DataSource = ds.Tables["c"];
-			//number.Text = ds.Tables["c"].Rows.Count.ToString();//某一表中数据的行数
-			conn.Close();
+			//conn.Open();
+			if (ds.HasChanges())
+			{
+				SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
+				dtp.Update(ds, "c");//注意这里更新的表为form_load里面的表注意这里就可以成功
+				courseMessage.Update();
+			}
+			dtp = new SqlDataAdapter("select * from C", conn);
+			dtp.Fill(ds, "save");
+			courseMessage.DataSource = ds.Tables["save"];
+			courseMessage.ReadOnly = true;
+			courseMessage.AllowUserToAddRows = false;
+			//conn.Close();
 		}
 
 		private void delete_Click(object sender, EventArgs e)
 		{
-			SqlDataAdapter dtp = new SqlDataAdapter("select * from c",conn);
-			courseMessage.Rows.RemoveAt(courseMessage.CurrentCell.RowIndex);
-			SqlCommandBuilder builder = new SqlCommandBuilder(dtp);
+			int line = this.courseMessage.CurrentRow.Index;
+			String primary = this.courseMessage.Rows[line].Cells[0].Value.ToString();
 			conn.Open();
-			DataSet ds = new DataSet();
+			dtp = new SqlDataAdapter("delete from C where cno = '" + primary + "'", conn);
 			dtp.Fill(ds, "delete");
-			dtp.Update(ds.Tables["delete"]);
+			courseMessage.DataSource = ds.Tables["delete"];
+			SqlDataAdapter deleteDtp = new SqlDataAdapter("select * from C", conn);
+			deleteDtp.Fill(ds, "fresh");
+			courseMessage.DataSource = ds.Tables["fresh"];
+			courseMessage.ReadOnly = false;
+			courseMessage.AllowUserToAddRows = true;
+			//MessageBox.Show(primary);
 			conn.Close();
-			//待定，手动删除之后需要更新数据库
+			courseMessage.ReadOnly = true;
+			courseMessage.AllowUserToAddRows = false;
 		}
 
 		private void exist_Click(object sender, EventArgs e)
@@ -66,13 +70,12 @@ namespace PBModel
 		private void CourseMessageForm_Load(object sender, EventArgs e)
 		{
 			courseMessage.ReadOnly = true;
+			courseMessage.AllowUserToAddRows = false;
 			conn.Open();
-			SqlDataAdapter dtp = new SqlDataAdapter("select * from c", conn);
-			DataSet ds = new DataSet();
+			dtp = new SqlDataAdapter("select * from c", conn);
 			dtp.Fill(ds, "c");
 			courseMessage.DataSource = ds.Tables["c"];
 			number.Text = ds.Tables["c"].Rows.Count.ToString();//某一表中数据的行数
-
 			conn.Close(); 
 		}
 	}

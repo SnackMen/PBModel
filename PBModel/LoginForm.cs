@@ -31,13 +31,13 @@ namespace PBModel
 			{
 				MainForm mainform = new MainForm(userName.Text);
 				mainform.Show();
-				this.Hide();
+				//this.Hide();
 			}
 			else if (userName.Text == "admin" && password.Text == "admin")
 			{
 				CourseForm course = new CourseForm();
 				course.Show();
-				this.Hide();
+				//this.Hide();
 			}
 			else
 			{
